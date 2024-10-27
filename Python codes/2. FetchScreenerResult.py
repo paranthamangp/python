@@ -12,6 +12,8 @@ Steps:
     (3) Load Payload table and copy the scan_clause. Example below
         ( {cash} ( weekly close > weekly sma( weekly close , 21 ) and weekly close > weekly sma( weekly close , 63 ) and weekly rsi( 14 ) > 60 and 1 week ago rsi( 14 ) < 60 and market cap < 200000000000 and latest open > 200 and latest volume > 5000 ) ) 
     (4) Update the condition in below script
+    
+Example: Get CIS stock list from Screener and print as table
 '''
 
 # mandatory  library
@@ -20,11 +22,13 @@ import requests
 from bs4 import BeautifulSoup as bs
 #from datetime import datetime
 
-
 url = "https://chartink.com/screener/process"
 
+# Get CIS stocks list
 condition = {"scan_clause": "( {cash} ( weekly close > weekly sma( weekly close , 21 ) and weekly close > weekly sma( weekly close , 63 ) and weekly rsi( 14 ) > 60 and 1 week ago rsi( 14 ) < 60 and market cap < 200000000000 and latest open > 200 and latest volume > 5000 ) )"} 
-#condition = {"scan_clause" : "( {cash} ( latest rsi( 9 ) > latest wma( latest rsi( 9 ) , 21 ) and 1 day ago  rsi( 9 ) <= 1 day ago  wma( latest rsi( 9 ) , 21 ) and latest rsi( 9 ) > 70 and market cap > 1500 ) ) "}
+
+# Get Cash / Nifty 500 stocks with daily RSI below 30
+#condition = {"scan_clause":"( {57960} ( latest volume > latest sma( volume,10 ) * 1.5 and latest close > 200 and latest rsi( 14 ) < 30 and 1 day ago  rsi( 14 ) >= 30 ) ) "}
 
 with requests.session() as s:
     r_data = s.get(url)
