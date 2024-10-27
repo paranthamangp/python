@@ -13,6 +13,7 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup as bs
 from datetime import datetime
+from pandas import DataFrame
 
 #Get telegram autnetication tokens
 import Credentials
@@ -39,6 +40,7 @@ bot = telegram.Bot(token=TOKEN)
 async def send_message(text, chat_id):
     async with bot:
         await bot.send_message(text=text, chat_id=chat_id)
+        
 
 async def main():
     
@@ -53,11 +55,14 @@ async def main():
         #make POST call to API
         data = s.post(url, headers=header, data=condition).json()
         screenerStockList = pd.DataFrame(data["data"])  
-        #add current date to data column
-        screenerStockList['date'] = pd.Timestamp.today().strftime('%Y-%m-%d') 
+        #print(screenerStockList) 
+        
         #Remove unwanted columns
-        screenerStockList = screenerStockList.drop(columns=['sr', 'bsecode','close','volume','date'])
-        screenerStockList.rename(columns={'nsecode': 'StockCode', 'name': 'StockName','per_chg':'Percentage'}, inplace=True)
+        screenerStockList = screenerStockList.drop(columns=['sr', 'bsecode','volume'])
+        screenerStockList = screenerStockList.filter(['close','nsecode','name','per_chg'])
+        screenerStockList.rename(columns={'nsecode': 'StockCode', 'name': 'StockName','per_chg':'Percentage','close':'Price'}, inplace=True)
+  
+
         #screenerStockList = screenerStockList.drop(screenerStockList.columns[[,4,5,6,7]], axis=1)
         #Print final stock list
         print("Stocks from Screener : ")
