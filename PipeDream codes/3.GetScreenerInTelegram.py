@@ -1,11 +1,12 @@
 '''
 Title: Get screener results in python
 
+Trigger: Set trigger to run for every 1 hour
+
 Step 1 : Fetch screener result using Python
 Step 2 : Send the fetched screener result to Telegram
 
 '''
-
 ################### Code for fetching screener result ###################
 
 # mandatory  library
@@ -15,8 +16,6 @@ from bs4 import BeautifulSoup as bs
 from datetime import datetime
 from pandas import DataFrame
 import pytz
-# Local file - Get telegram authentication tokens
-import Credentials
 
 #Get IST timezone
 IST = pytz.timezone('Asia/Kolkata') 
@@ -32,9 +31,8 @@ condition = {"scan_clause": "( {cash} ( weekly close > weekly sma( weekly close 
 import asyncio
 import telegram
 
-#Replace tokens in credentials.py file (or) hardcode the token here
-TOKEN = Credentials.token
-chat_id = Credentials.chatId
+TOKEN = 'TELEGRAM_TOKEN_CODE'
+chat_id = 'TELEGRAM_CHATID'
 
 
 # Channel ID Sample: -1001829542722
@@ -44,12 +42,12 @@ async def send_message(text, chat_id):
     async with bot:
         await bot.send_message(text=text, chat_id=chat_id)
         
-
 async def main():
     
     with requests.session() as s:
         r_data = s.get(url)
-        soup = bs(r_data.content, "lxml")
+        #soup = bs(r_data.content, "lxml")
+        soup = bs(r_data.content,  "html.parser")
         
         #get CSRF token from browser for Chartink Validation
         meta = soup.find("meta", {"name" : "csrf-token"})["content"]
@@ -68,12 +66,12 @@ async def main():
 
         #screenerStockList = screenerStockList.drop(screenerStockList.columns[[,4,5,6,7]], axis=1)
         #Print final stock list
-        print("Stocks from Screener : ")
-        print(screenerStockList) 
+        #print("Stocks from Screener : ")
+        #print(screenerStockList) 
         
         # Sending a message
         #CurrentTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        MessageToBeSent = 'CIS Screener result '+datetime.now(IST).strftime('%Y-%m-%d %H:%M:%S' )+ '\n' +'\n' + screenerStockList.to_string()
+        MessageToBeSent = 'CIS Screener result from PipeDream '+datetime.now(IST).strftime('%Y-%m-%d %H:%M:%S' )+ '\n' +'\n' + screenerStockList.to_string()
         await send_message(text=MessageToBeSent, chat_id=chat_id)
         #screenerStockList = screenerStockList.to_string()
         #await send_message(text=screenerStockList, chat_id=chat_id)

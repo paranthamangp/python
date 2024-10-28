@@ -1,0 +1,2 @@
+token = 'ReplaceTelegramToken'
+chatId = 'ReplaceTelegramChatId'
